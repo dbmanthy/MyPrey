@@ -6,6 +6,7 @@ public class Grid : MonoBehaviour {
 
     //fields
     public Transform player;
+    public bool onlyDisplayPathGizmos;
 
     //grid properties
     public LayerMask unwalkableMask, walkableMask;
@@ -26,7 +27,10 @@ public class Grid : MonoBehaviour {
         CreateGrid();
     }
 
-    void Update () {
+    public int MaxSize {
+        get {
+            return gridSizeX * gridSizeY * gridSizeZ;
+        }
     }
 
     void CreateGrid () {
@@ -86,19 +90,34 @@ public class Grid : MonoBehaviour {
     public List<Node> path;
     private void OnDrawGizmos (){
         Gizmos.DrawWireCube(transform.position, gridWorldSize);
-        if (grid != null) {
-            Node playerNode = GetNodeFromWorldPosition(player.position);
-            foreach (Node n in grid) {
-                Gizmos.color = (n.walkable) ? Color.white : Color.clear;
-                if (playerNode == n) {
-                    Gizmos.color = Color.magenta;
+
+        if (onlyDisplayPathGizmos)
+        {
+            if (path != null)
+            {
+                foreach (Node n in path)
+                {
+                    Gizmos.color = Color.black;
+                    Gizmos.DrawCube(n.worldPostion, Vector3.one * (nodeDiameter - .1f));
                 }
-                if (path != null){
-                    if(path.Contains(n)){
-                        Gizmos.color = Color.black;
-                    }
+            }
+        }
+        else
+        {
+
+            if (grid != null)
+            {
+                Node playerNode = GetNodeFromWorldPosition(player.position);
+                foreach (Node n in grid)
+                {
+                    Gizmos.color = (n.walkable) ? Color.white : Color.clear;
+                    if (playerNode == n)
+                        Gizmos.color = Color.magenta;
+                    if (path != null)
+                        if (path.Contains(n))
+                            Gizmos.color = Color.black;
+                    Gizmos.DrawCube(n.worldPostion, Vector3.one * (nodeDiameter - .1f));
                 }
-                Gizmos.DrawCube(n.worldPostion, Vector3.one * (nodeDiameter - .1f));
             }
         }
     }
